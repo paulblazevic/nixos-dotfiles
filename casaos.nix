@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   virtualisation.containers.enable = true;
@@ -9,8 +9,8 @@
   };
   virtualisation.oci-containers.backend = "podman";
 
-  virtualisation.oci-containers.containers.casaos = {
-    image = "casaos/casaos:latest";
+  virtualisation.oci-containers.containers.casaos = lib.mkForce {
+    image = lib.mkForce "casaos/casaos:latest";  # Force override old image
     autoStart = true;
     ports = [ "8080:80" ];
     volumes = [

@@ -3,9 +3,7 @@
 {
   imports = [
   ./casaos.nix
-  ./casaos.container.nix
     ./hardware-configuration.nix
-    ./casaos.container.nix    # ← add this
   # ... your other imports (if any)
 ];
 
