@@ -61,20 +61,43 @@
   };
   virtualisation.docker.enable = lib.mkForce false;
 
+  # ── LIBVIRTD + VIRT-MANAGER ──
+  virtualisation.libvirtd = {
+    enable = true;
+    qemuRunAsRoot = false;
+    qemuOvmf = true;   # UEFI support
+};
+
+  environment.systemPackages = with pkgs; [
+    distrobox
+    vim
+    git
+];
+
+  virtualisation.spiceUSBRedirection.enable = true;
+  # ─────────────────────────────
+
   # Distrobox extra volume (recommended)
   environment.etc."distrobox/distrobox.conf".text = ''
     container_additional_volumes="/nix/store:/nix/store:ro"
   '';
 
-  # ── User paul ────────────────────────
   users.users.paul = {
-    isNormalUser = true;
-    description = "Paul Blazevic";
-    extraGroups = [ "wheel" "networkmanager" "podman" "audio" "video" ];
-    initialPassword = "changeme"; # change this ASAP
-    subUidRanges = [{ startUid = 100000; count = 65536; }];
-    subGidRanges = [{ startGid = 100000; count = 65536; }];
-  };
+  isNormalUser = true;
+  description = "Paul Blazevic";
+  initialPassword = "changeme"; # change ASAP
+  extraGroups = [
+    "wheel"
+    "networkmanager"
+    "podman"
+    "audio"
+    "video"
+    "libvirtd"
+    "kvm"
+  ];
+  subUidRanges = [{ startUid = 100000; count = 65536; }];
+  subGidRanges = [{ startGid = 100000; count = 65536; }];
+};
 
   # ── System packages ──────────────────
   environment.systemPackages = with pkgs; [
@@ -89,6 +112,10 @@
     proton-pass
     firefox
     vivaldi
+
+  # NEW APPS YOU WANT
+    nemo
+    virt-manager
   ];
 
   # ── Flatpaks (run once on user login) ──
