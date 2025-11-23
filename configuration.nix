@@ -2,7 +2,6 @@
 
 {
   imports = [
-  ./casaos.nix
     ./hardware-configuration.nix
   # ... your other imports (if any)
 ];
