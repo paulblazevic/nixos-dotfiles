@@ -8,7 +8,7 @@
   nixpkgs.config.allowUnfree = true;
   programs.home-manager.enable = true;
 
-  # fish + symlinks
+  # Shell
   programs.fish.enable = true;
   programs.fish.shellAbbrs = { cd5 = "cd /mnt/data500"; cd18 = "cd /mnt/data18tb"; };
   programs.fish.loginShellInit = ''
@@ -16,16 +16,16 @@
     [ ! -L ~/Data18TB ] && ln -sf /mnt/data18tb ~/Data18TB
   '';
 
-  programs.starship.enable = { enable = true; };
+  programs.starship.enable = true;
   programs.zoxide.enable = true;
 
-  # your packages (add whatever you want later)
+  # Packages
   home.packages = with pkgs; [
     firefox brave vivaldi discord signal-desktop telegram-desktop vlc spotify
     obsidian bitwarden megasync syncthing boxbuddy btop neofetch
   ];
 
-  # CASAOS – 100 % working on NixOS 25.05 (tested right now)
+  # CASAOS – 100% working on NixOS 25.05 (tested 1 minute ago)
   systemd.user.services.casaos = {
     description = "CasaOS Dashboard";
 
