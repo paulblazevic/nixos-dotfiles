@@ -23,21 +23,32 @@
     obsidian bitwarden megasync syncthing boxbuddy btop neofetch
   ];
 
+  # THIS IS THE ONLY SYNTAX THAT WORKS ON 25.05
   systemd.user.services.casaos = {
     unitConfig = {
       Description = "CasaOS Dashboard";
-      After = [ "network.target" "podman.socket" ];
+      After = "network.target podman.socket";
       Requires = "podman.socket";
     };
 
     serviceConfig = {
       Type = "simple";
-      ExecStart = "${pkgs.podman}/bin/podman run --rm --name casaos --userns=keep-id -p 8080:80 -v %h/casaos-data:/DATA:Z -v /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z -e TZ=Australia/Sydney docker.io/casaos/casaos:latest";
+      ExecStart = ''
+        ${pkgs.podman}/bin/podman run --rm --name casaos \
+          --userns=keep-id \
+          -p 8080:80 \
+          -v ${config.home.homeDirectory}/casaos-data:/DATA:Z \
+          -v /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z \
+          -e TZ=Australia/Sydney \
+          docker.io/casaos/casaos:latest
+      '';
       Restart = "always";
       RestartSec = 10;
-      TimeoutStartSec = 120;
+      TimeoutStartSec = 300;
     };
 
-    install.WantedBy = [ "default.target" ];
+    install = {
+      WantedBy = [ "default.target" ];
+    };
   };
 }
