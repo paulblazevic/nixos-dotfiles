@@ -25,15 +25,11 @@
     obsidian bitwarden megasync syncthing boxbuddy btop neofetch
   ];
 
-  # Rootless Podman setup (required for services.podman)
-  virtualisation.podman.enable = true;
-
-  # CasaOS – stable rootless Podman service via Home Manager module
+  # Rootless Podman + CasaOS (stable module – no systemd bugs)
   services.podman = {
     enable = true;
     dockerSocket.enable = true;
     defaultNetwork.settings.dns_enabled = true;
-    autoStart = true;
 
     containers.casaos = {
       image = "casaos/casaos:latest";
