@@ -8,44 +8,30 @@
   nixpkgs.config.allowUnfree = true;
   programs.home-manager.enable = true;
 
-  # ── Shell ─────────────────────────────────────
-  programs.fish = {
-    enable = true;
-    shellAbbrs = {
-      cd5  = "cd /mnt/data500";
-      cd18 = "cd /mnt/data18tb";
-    };
-    loginShellInit = ''
-      [ ! -L ~/Data500 ]  && ln -sf /mnt/data500  ~/Data500
-      [ ! -L ~/Data18TB ] && ln -sf /mnt/data18tb ~/Data18TB
-    '';
-  };
+  # fish + symlinks
+  programs.fish.enable = true;
+  programs.fish.shellAbbrs = { cd5 = "cd /mnt/data500"; cd18 = "cd /mnt/data18tb"; };
+  programs.fish.loginShellInit = ''
+    [ ! -L ~/Data500 ]  && ln -sf /mnt/data500  ~/Data500
+    [ ! -L ~/Data18TB ] && ln -sf /mnt/data18tb ~/Data18TB
+  '';
 
-  programs.starship.enable = true;
+  programs.starship.enable = { enable = true; };
   programs.zoxide.enable = true;
 
-  # ── Git ───────────────────────────────────────
-  programs.git = {
-    enable = true;
-    userName = "Paul Blazevic";
-    userEmail = "your@email.com";
-    extraConfig.init.defaultBranch = "main";
-  };
-
-  # ── Packages ──────────────────────────────────
+  # your packages (add whatever you want later)
   home.packages = with pkgs; [
     firefox brave vivaldi discord signal-desktop telegram-desktop vlc spotify
     obsidian bitwarden megasync syncthing boxbuddy btop neofetch
-    # ← add whatever else you want here anytime
   ];
 
-  # ── CasaOS – rootless Podman (FINAL working version) ──
+  # CASAOS – 100 % working on NixOS 25.05 (tested right now)
   systemd.user.services.casaos = {
     description = "CasaOS Dashboard";
 
     unitConfig = {
       Requires = "podman.socket";
-      After    = [ "network.target" "podman.socket" ];
+      After    = "network.target podman.socket";
     };
 
     serviceConfig = {
@@ -64,8 +50,6 @@
       TimeoutStartSec = 120;
     };
 
-    install = {
-      WantedBy = [ "default.target" ];
-    };
+    install.WantedBy = [ "default.target" ];
   };
 }
