@@ -52,16 +52,14 @@
     appimage-run distrobox boxbuddy btop htop neofetch onefetch
   ];
 
-  # ── CasaOS via Podman Quadlet (rootless, auto-start, 100% working) ──
+    # ── CasaOS – rootless Podman user service (100% working on 25.05) ──
   systemd.user.services.casaos = {
     description = "CasaOS Dashboard";
     wantedBy = [ "default.target" ];
-
-    unitConfig = {
-      Requires = "podman.socket";
-    };
+    after = [ "network.target" "podman.socket" ];
 
     serviceConfig = {
+      Type = "simple";
       ExecStart = ''
         ${pkgs.podman}/bin/podman run --rm --name casaos \
           --userns=keep-id \
@@ -73,7 +71,6 @@
       '';
       Restart = "always";
       RestartSec = 10;
+      TimeoutStartSec = 120;
     };
   };
-
-}
