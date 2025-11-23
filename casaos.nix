@@ -5,12 +5,12 @@
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
-    defaultNetwork.settings.dns_enabled = true;  # For container networking
+    defaultNetwork.settings.dns_enabled = true;
   };
   virtualisation.oci-containers.backend = "podman";
 
   virtualisation.oci-containers.containers.casaos = lib.mkForce {
-    image = lib.mkForce "casaos/casaos:latest";  # Force override old image
+    image = lib.mkForce "casaos/casaos:latest";
     autoStart = true;
     ports = [ "8080:80" ];
     volumes = [
@@ -20,9 +20,9 @@
     environment = {
       TZ = "Australia/Sydney";
     };
-    extraOptions = [ "--userns=keep-id" ];
+    extraOptions = [ "--privileged" ];  # Required for CasaOS Docker management
   };
 
   networking.firewall.allowedTCPPorts = [ 8080 ];
-  users.groups.podman.members = [ "paul" ];  # Rootless access for your user
+  users.groups.podman.members = [ "paul" ];  # For user access to podman commands
 }
