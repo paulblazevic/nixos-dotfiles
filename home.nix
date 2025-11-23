@@ -23,7 +23,6 @@
       ls18tb = "ls -lh /mnt/data18tb";
     };
     loginShellInit = ''
-      # Create nice symlinks in ~ the first time (idempotent)
       [ ! -L ~/Data500 ]  && ln -sf /mnt/data500  ~/Data500
       [ ! -L ~/Data18TB ] && ln -sf /mnt/data18tb ~/Data18TB
     '';
@@ -36,49 +35,30 @@
   programs.git = {
     enable = true;
     userName = "Paul Blazevic";
-    userEmail = "your@email.com";  # ← change this to your real email
-    extraConfig = {
-      init.defaultBranch = "main";
-    };
+    userEmail = "your@email.com";
+    extraConfig.init.defaultBranch = "main";
   };
 
-  # ── All your user packages (feel free to add more anytime) ─────────────────────
+  # ── Packages ─────────────────────────────────────
   home.packages = with pkgs; [
-    # Browsers
     firefox brave vivaldi tor-browser-bundle-bin
-
-    # Chat / Comms
     discord signal-desktop telegram-desktop element-desktop
-
-    # Media
     vlc mpv haruna spotify audacious
-
-    # Productivity / Notes
     obsidian logseq trilium-desktop joplin-desktop
-
-    # File management
     krusader doublecmd ranger pcmanfm-qt
-
-    # Utilities
     bitwarden proton-pass keepassxc megasync syncthing rclone rsync yt-dlp gallery-dl
-
-    # Image / Video tools
     gimp inkscape krita darktable shotwell xnviewmp
-
-    # Audio production
     reaper yabridge yabridgectl wineWowPackages.staging
-
-    # Misc
     appimage-run distrobox boxbuddy btop htop neofetch onefetch
   ];
 
-    # ── CasaOS via Podman Quadlet (rootless, auto-start, 100% working on 25.05) ──
+  # ── CasaOS via Podman Quadlet (rootless, auto-start, 100% working) ──
   systemd.user.services.casaos = {
     description = "CasaOS Dashboard";
     wantedBy = [ "default.target" ];
 
     unitConfig = {
-      Requires = "podman.socket";   # makes sure the user podman socket is up
+      Requires = "podman.socket";
     };
 
     serviceConfig = {
@@ -95,3 +75,5 @@
       RestartSec = 10;
     };
   };
+
+}
