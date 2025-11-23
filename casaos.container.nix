@@ -5,7 +5,7 @@
   virtualisation.oci-containers.backend = "podman";
 
   virtualisation.oci-containers.containers.casaos = {
-    image = "docker.io/icewhaleoss/casaos:latest";
+    image = "docker.io/casaos/casaos:latest";
     autoStart = true;
     ports = [ "80:80" ];
     volumes = [
