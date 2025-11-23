@@ -25,24 +25,27 @@
     obsidian bitwarden megasync syncthing boxbuddy btop neofetch
   ];
 
-  # Rootless Podman + CasaOS (stable module – no systemd bugs)
-  services.podman = {
-    enable = true;
-    dockerSocket.enable = true;
-    defaultNetwork.settings.dns_enabled = true;
+  # Simple user service for CasaOS (raw ExecStart, no syntax bugs)
+  systemd.user.services.casaos = {
+    description = "CasaOS Dashboard";
+    wantedBy = [ "default.target" ];
+    after = [ "network.target" "podman.socket" ];
+    requires = [ "podman.socket" ];
 
-    containers.casaos = {
-      image = "casaos/casaos:latest";
-      autoStart = true;
-      ports = [ "8080:80" ];
-      volumes = [
-        "${config.home.homeDirectory}/casaos-data:/DATA"
-        "/run/user/1000/podman/podman.sock:/var/run/docker.sock"
-      ];
-      environment = {
-        TZ = "Australia/Sydney";
-      };
-      extraOptions = [ "--userns=keep-id" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = pkgs.writeShellScript "casaos-start" ''
+        ${pkgs.podman}/bin/podman run --rm --name casaos \
+          --userns=keep-id \
+          -p 8080:80 \
+          -v $HOME/casaos-data:/DATA:Z \
+          -v /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z \
+          -e TZ=Australia/Sydney \
+          docker.io/casaos/casaos:latest
+      '';
+      Restart = "always";
+      RestartSec = 10;
+      TimeoutStartSec = 120;
     };
   };
 }
