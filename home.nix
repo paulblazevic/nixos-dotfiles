@@ -8,6 +8,7 @@
   nixpkgs.config.allowUnfree = true;
   programs.home-manager.enable = true;
 
+  # Shell
   programs.fish.enable = true;
   programs.fish.shellAbbrs = { cd5 = "cd /mnt/data500"; cd18 = "cd /mnt/data18tb"; };
   programs.fish.loginShellInit = ''
@@ -18,36 +19,34 @@
   programs.starship.enable = true;
   programs.zoxide.enable = true;
 
+  # Packages
   home.packages = with pkgs; [
     firefox brave vivaldi discord signal-desktop telegram-desktop vlc spotify
     obsidian bitwarden megasync syncthing boxbuddy btop neofetch
   ];
 
-  systemd.user.services.casaos = {
-    unitConfig = {
-      Description = "CasaOS Dashboard";
-      Requires    = "podman.socket";
-      After       = "network.target podman.socket";
-    };
+  # Rootless Podman setup (required for services.podman)
+  virtualisation.podman.enable = true;
 
-    serviceConfig = {
-      Type            = "simple";
-      ExecStart       = ''
-        ${pkgs.podman}/bin/podman run --rm --name casaos \
-          --userns=keep-id \
-          -p 8080:80 \
-          -v ${config.home.homeDirectory}/casaos-data:/DATA:Z \
-          -v /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z \
-          -e TZ=Australia/Sydney \
-          docker.io/casaos/casaos:latest
-      '';
-      Restart         = "always";
-      RestartSec      = 10;
-      TimeoutStartSec = 120;
-    };
+  # CasaOS – stable rootless Podman service via Home Manager module
+  services.podman = {
+    enable = true;
+    dockerSocket.enable = true;
+    defaultNetwork.settings.dns_enabled = true;
+    autoStart = true;
 
-    install = {
-      WantedBy = [ "default.target" ];
+    containers.casaos = {
+      image = "casaos/casaos:latest";
+      autoStart = true;
+      ports = [ "8080:80" ];
+      volumes = [
+        "${config.home.homeDirectory}/casaos-data:/DATA"
+        "/run/user/1000/podman/podman.sock:/var/run/docker.sock"
+      ];
+      environment = {
+        TZ = "Australia/Sydney";
+      };
+      extraOptions = [ "--userns=keep-id" ];
     };
   };
 }
