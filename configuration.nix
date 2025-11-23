@@ -69,9 +69,7 @@
 };
 
   environment.systemPackages = with pkgs; [
-    distrobox
-    vim
-    git
+
 ];
 
   virtualisation.spiceUSBRedirection.enable = true;
