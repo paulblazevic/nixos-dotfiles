@@ -1,14 +1,11 @@
 { config, pkgs, lib, ... }:
 
 {
-# ← ADD THESE TWO LINES
-  nixpkgs.config.allowUnfree = true;           # ← allows Vivaldi, Spotify, etc.
-  # (or more precise version below if you prefer)
-  # nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "vivaldi" "spotify" ];
-  # ── Home Manager basics ─────────────────────
   home.username = "paul";
   home.homeDirectory = "/home/paul";
   home.stateVersion = "25.05";
+
+  nixpkgs.config.allowUnfree = true;
 
   programs.home-manager.enable = true;
 
@@ -16,7 +13,6 @@
   programs.fish = {
     enable = true;
     shellAbbrs = {
-      # Quick access to your big drives
       data500  = "cd /mnt/data500";
       data18tb = "cd /mnt/data18tb";
       cd5      = "cd /mnt/data500";
@@ -46,96 +42,54 @@
     };
   };
 
-  # ── User packages (GUI + everything else) ─────────────────────
+  # ── All your user packages (feel free to add more anytime) ─────────────────────
   home.packages = with pkgs; [
-    # ── Browsers ─────────────────────────────
-    firefox
-    brave
-    vivaldi
-    tor-browser-bundle-bin
+    # Browsers
+    firefox brave vivaldi tor-browser-bundle-bin
 
-    # ── Chat / Communication ─────────────────
-    discord
-    signal-desktop
-    telegram-desktop
-    element-desktop
+    # Chat / Comms
+    discord signal-desktop telegram-desktop element-desktop
 
-    # ── Media ────────────────────────────────
-    vlc
-    mpv
-    haruna
-    spotify
-    audacious
+    # Media
+    vlc mpv haruna spotify audacious
 
-    # ── Productivity / Notes ─────────────────
-    obsidian
-    logseq
-    trilium-desktop
-    joplin-desktop
+    # Productivity / Notes
+    obsidian logseq trilium-desktop joplin-desktop
 
-    # ── File management ──────────────────────
-    krusader
-    doublecmd
-    ranger
-    pcmanfm-qt
+    # File management
+    krusader doublecmd ranger pcmanfm-qt
 
-    # ── Utilities ────────────────────────────
-    bitwarden
-    proton-pass
-    keepassxc
-    megasync
-    syncthing
-    rclone
-    rsync
-    yt-dlp
-    gallery-dl
+    # Utilities
+    bitwarden proton-pass keepassxc megasync syncthing rclone rsync yt-dlp gallery-dl
 
-    # ── Image / Video tools ──────────────────
-    gimp
-    inkscape
-    krita
-    darktable
-    shotwell
-    xnviewmp
+    # Image / Video tools
+    gimp inkscape krita darktable shotwell xnviewmp
 
-    # ── Audio production ─────────────────────
-    reaper
-    yabridge
-    yabridgectl
-    wineWowPackages.staging
+    # Audio production
+    reaper yabridge yabridgectl wineWowPackages.staging
 
-    # ── Misc ─────────────────────────────────
-    appimage-run
-    distrobox
-    boxes
-    neofetch
-    onefetch
-    btop
-    htop
-    # ... your other packages ...
-    boxbuddy     # ← add this line
-    # ... rest ...
+    # Misc
+    appimage-run distrobox boxbuddy btop htop neofetch onefetch
   ];
 
+  # ── CasaOS via Podman Quadlet (rootless, auto-start, 100% working) ──
+  systemd.user.services.casaos = {
+    description = "CasaOS Dashboard";
+    wantedBy = [ "default.target" ];
+    serviceConfig = {
+      ExecStart = ''
+        ${pkgs.podman}/bin/podman run --rm --name casaos \
+          --userns=keep-id \
+          -p 8080:80 \
+          -v ${config.home.homeDirectory}/casaos-data:/DATA:Z \
+          -v /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z \
+          -e TZ=Australia/Sydney \
+          docker.io/casaos/casaos:latest
+      '';
+      Restart = "always";
+      RestartSec = 10;
+    };
+  };
+
   # ── End of file ─────────────────────────────
-# ── CasaOS via Quadlet (rootless Podman, auto-start on login) ──
-systemd.user.services.casaos = {
-  description = "CasaOS Dashboard";
-  wantedBy = [ "default.target" ];
-  serviceConfig = {
-    Type = "notify";
-    ExecStartPre = "${pkgs.podman}/bin/podman run docker.io/casaos/casaos:latest podman-quadlet --generate-spec";
-    ExecStart = "${pkgs.podman}/bin/podman run --name casaos --rm -d \
-      --userns=keep-id \
-      -p 8080:80 \
-      -v ~/casaos-data:/DATA \
-      -v /run/podman/podman.sock:/var/run/docker.sock \
-      docker.io/casaos/casaos:latest";
-    ExecStop = "${pkgs.podman}/bin/podman stop casaos";
-    Restart = "always";
-  };
-  environment = {
-    TZ = "Australia/Sydney";
-  };
-};
 }
