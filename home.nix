@@ -23,12 +23,13 @@
     obsidian bitwarden megasync syncthing boxbuddy btop neofetch
   ];
 
-  # CASAOS – THE ONE THAT ACTUALLY WORKS ON 25.05
+  # CASAOS – THE ONE THAT WORKS ON YOUR MACHINE RIGHT NOW
   systemd.user.services.casaos = {
-    description = "CasaOS Dashboard";
-    wantedBy = [ "default.target" ];
-    after = [ "network.target" "podman.socket" ];
-    requires = [ "podman.socket" ];
+    unitConfig = {
+      Description = "CasaOS Dashboard";
+      Requires    = "podman.socket";
+      After       = "network.target podman.socket";
+    };
 
     serviceConfig = {
       Type = "simple";
@@ -44,6 +45,9 @@
       Restart = "always";
       RestartSec = 10;
       TimeoutStartSec = 120;
+    120;
     };
+
+    install.WantedBy = [ "default.target" ];
   };
 }
