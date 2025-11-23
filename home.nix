@@ -34,12 +34,12 @@
     serviceConfig = {
       Type = "simple";
       ExecStart = ''
-        ${pkgs.podman}/bin/podman run --rm --name casaos \
-          --userns=keep-id \
-          -p 8080:80 \
-          -v ${config.home.homeDirectory}/casaos-data:/DATA:Z \
-          -v /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z \
-          -e TZ=Australia/Sydney \
+        ${pkgs.podman}/bin/podman run --rm --name casaos \\
+          --userns=keep-id \\
+          -p 8080:80 \\
+          -v ${config.home.homeDirectory}/casaos-data:/DATA:Z \\
+          -v /run/user/1000/podman/podman.sock:/var/run/docker.sock:Z \\
+          -e TZ=Australia/Sydney \\
           docker.io/casaos/casaos:latest
       '';
       Restart = "always";
