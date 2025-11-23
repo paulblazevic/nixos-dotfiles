@@ -6,21 +6,14 @@
   home.stateVersion = "25.05";
 
   nixpkgs.config.allowUnfree = true;
-
   programs.home-manager.enable = true;
 
-  # ── Shell (fish) ────────────────────────────
+  # ── Shell ─────────────────────────────────────
   programs.fish = {
     enable = true;
     shellAbbrs = {
-      data500  = "cd /mnt/data500";
-      data18tb = "cd /mnt/data18tb";
-      cd5      = "cd /mnt/data500";
-      cd18     = "cd /mnt/data18tb";
-    };
-    shellAliases = {
-      ls500  = "ls -lh /mnt/data500";
-      ls18tb = "ls -lh /mnt/data18tb";
+      cd5  = "cd /mnt/data500";
+      cd18 = "cd /mnt/data18tb";
     };
     loginShellInit = ''
       [ ! -L ~/Data500 ]  && ln -sf /mnt/data500  ~/Data500
@@ -31,7 +24,7 @@
   programs.starship.enable = true;
   programs.zoxide.enable = true;
 
-  # ── Git ─────────────────────────────────────
+  # ── Git ───────────────────────────────────────
   programs.git = {
     enable = true;
     userName = "Paul Blazevic";
@@ -39,20 +32,14 @@
     extraConfig.init.defaultBranch = "main";
   };
 
-  # ── Packages ─────────────────────────────────────
+  # ── Packages ──────────────────────────────────
   home.packages = with pkgs; [
-    firefox brave vivaldi tor-browser-bundle-bin
-    discord signal-desktop telegram-desktop element-desktop
-    vlc mpv haruna spotify audacious
-    obsidian logseq trilium-desktop joplin-desktop
-    krusader doublecmd ranger pcmanfm-qt
-    bitwarden proton-pass keepassxc megasync syncthing rclone rsync yt-dlp gallery-dl
-    gimp inkscape krita darktable shotwell xnviewmp
-    reaper yabridge yabridgectl wineWowPackages.staging
-    appimage-run distrobox boxbuddy btop htop neofetch onefetch
+    firefox brave vivaldi discord signal-desktop telegram-desktop vlc spotify
+    obsidian bitwarden megasync syncthing boxbuddy btop neofetch
+    # ← add whatever else you want here anytime
   ];
 
-  # ── CasaOS – rootless Podman user service (FINAL 100% working on 25.05) ──
+  # ── CasaOS – rootless Podman (FINAL working version) ──
   systemd.user.services.casaos = {
     description = "CasaOS Dashboard";
 
@@ -62,8 +49,8 @@
     };
 
     serviceConfig = {
-      Type          = "simple";
-      ExecStart     = ''
+      Type = "simple";
+      ExecStart = ''
         ${pkgs.podman}/bin/podman run --rm --name casaos \
           --userns=keep-id \
           -p 8080:80 \
@@ -72,10 +59,13 @@
           -e TZ=Australia/Sydney \
           docker.io/casaos/casaos:latest
       '';
-      Restart       = "always";
-      RestartSec    = 10;
+      Restart = "always";
+      RestartSec = 10;
       TimeoutStartSec = 120;
     };
 
-    wantedBy = [ "default.target" ];
+    install = {
+      WantedBy = [ "default.target" ];
+    };
   };
+}
