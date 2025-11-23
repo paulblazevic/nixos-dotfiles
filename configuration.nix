@@ -143,3 +143,6 @@
   # ── End of file ──────────────────────
   system.stateVersion = "25.05";
 }
+
+# Quadlet user generator for rootless Podman (fixes generation of .service files)
+environment.etc."systemd/user-generators/podman-user-generator".source = "${pkgs.podman}/lib/systemd/user-generators/podman-user-generator";
