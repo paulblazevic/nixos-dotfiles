@@ -24,7 +24,7 @@
   ];
 
   systemd.user.services.casaos = {
-    description = "CasaOS Dashboard";
+    unitConfig.Description = "CasaOS Dashboard";
 
     unitConfig = {
       Requires = "podman.socket";
