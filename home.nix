@@ -23,7 +23,6 @@
     obsidian bitwarden megasync syncthing boxbuddy btop neofetch
   ];
 
-  # CASAOS – THE ONE THAT WORKS ON YOUR MACHINE RIGHT NOW
   systemd.user.services.casaos = {
     unitConfig = {
       Description = "CasaOS Dashboard";
@@ -32,8 +31,8 @@
     };
 
     serviceConfig = {
-      Type = "simple";
-      ExecStart = ''
+      Type            = "simple";
+      ExecStart       = ''
         ${pkgs.podman}/bin/podman run --rm --name casaos \
           --userns=keep-id \
           -p 8080:80 \
@@ -42,12 +41,13 @@
           -e TZ=Australia/Sydney \
           docker.io/casaos/casaos:latest
       '';
-      Restart = "always";
-      RestartSec = 10;
+      Restart         = "always";
+      RestartSec      = 10;
       TimeoutStartSec = 120;
-    120;
     };
 
-    install.WantedBy = [ "default.target" ];
+    install = {
+      WantedBy = [ "default.target" ];
+    };
   };
 }
