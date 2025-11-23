@@ -118,4 +118,24 @@
   ];
 
   # ── End of file ─────────────────────────────
+# ── CasaOS via Quadlet (rootless Podman, auto-start on login) ──
+systemd.user.services.casaos = {
+  description = "CasaOS Dashboard";
+  wantedBy = [ "default.target" ];
+  serviceConfig = {
+    Type = "notify";
+    ExecStartPre = "${pkgs.podman}/bin/podman run docker.io/casaos/casaos:latest podman-quadlet --generate-spec";
+    ExecStart = "${pkgs.podman}/bin/podman run --name casaos --rm -d \
+      --userns=keep-id \
+      -p 8080:80 \
+      -v ~/casaos-data:/DATA \
+      -v /run/podman/podman.sock:/var/run/docker.sock \
+      docker.io/casaos/casaos:latest";
+    ExecStop = "${pkgs.podman}/bin/podman stop casaos";
+    Restart = "always";
+  };
+  environment = {
+    TZ = "Australia/Sydney";
+  };
+};
 }
