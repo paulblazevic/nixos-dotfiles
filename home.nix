@@ -25,6 +25,7 @@
 
   systemd.user.services.casaos = {
     unitConfig.Description = "CasaOS Dashboard";
+    install.WantedBy = [ "default.target" ];
 
     unitConfig = {
       Requires = "podman.socket";
