@@ -1,7 +1,12 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [
+  ./casaos.container.nix
+    ./hardware-configuration.nix
+    ./casaos.container.nix    # ← add this
+  # ... your other imports (if any)
+];
 
   # ── Nix settings ─────────────────────
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
